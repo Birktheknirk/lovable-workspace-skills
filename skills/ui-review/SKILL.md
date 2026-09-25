@@ -5,65 +5,160 @@ description: Audit an existing web interface for visual polish, interaction qual
 
 # UI Review
 
-Review the existing interface before changing it. Focus on the user experience and keep the project's architecture intact.
+Review the existing interface before changing it. Focus on user experience, visual quality, accessibility, and responsive behavior while preserving the project's architecture.
 
 ## Technology boundary
 
-Do not introduce, remove, or replace technologies during a UI review unless the user explicitly asks for a technology change.
+- Do not introduce, remove, or replace technologies during a UI review unless the user explicitly requests a technology change.
+- Do not turn a visual review into an architectural refactor.
+- Prefer existing components, tokens, utilities, and patterns.
+- If a recommendation appears to require a new dependency, first look for an existing project capability that solves it.
 
-Do not turn a visual review into an architectural refactor.
+## Review process
 
-## Review order
+Follow this order:
 
-Inspect:
+1. Understand the user's primary task and the page's role.
+2. Inspect the existing implementation and identify reusable patterns.
+3. Review visual hierarchy, spacing, typography, and surface treatment.
+4. Review component consistency and interaction states.
+5. Review motion and responsive behavior.
+6. Review accessibility and state completeness.
+7. Identify unnecessary visual complexity.
+8. Prioritize the smallest set of high-value changes.
 
-1. visual hierarchy
-2. spacing and alignment
-3. typography
-4. component consistency
-5. interaction and state feedback
-6. motion
-7. accessibility
-8. responsive/mobile behavior
-9. loading, empty, and error states
-10. unnecessary visual complexity
+Do not redesign the product simply because a different layout could look interesting. Review against the product's existing intent and workflow.
 
-## Review method
+## Review dimensions
 
-For every issue, explain:
+### Visual hierarchy
 
-- what is currently happening
-- what should change
-- why the change improves the user experience
-- the smallest practical implementation approach
+Check whether the interface clearly communicates:
+- what matters most
+- what is actionable
+- what is secondary
+- where the user is and what context they are in
 
-Prioritize issues that users will notice repeatedly over rare cosmetic details.
+Look for weak hierarchy caused by excessive emphasis rather than missing decoration.
 
-## Required output for code reviews
+### Spacing and alignment
 
-When reviewing code, use this table format:
+Check:
+- consistency of spacing
+- alignment across repeated elements
+- section rhythm
+- control grouping
+- accidental gaps or crowding
 
-| Current | Recommended | Why |
-| --- | --- | --- |
-| Current implementation or behavior | Concrete improvement | Short rationale |
+Prefer the project's existing spacing system.
 
-Keep recommendations implementation-ready but avoid introducing new dependencies.
+### Typography
 
-## Visual review
+Check:
+- heading hierarchy
+- text weight
+- line height
+- tracking where relevant
+- readability of secondary information
+- consistency across similar surfaces
 
-Look for:
+Do not introduce a new typeface during a normal UI review.
 
-- inconsistent spacing
-- arbitrary radii
-- weak hierarchy
-- too many borders or shadows
-- ambiguous primary actions
-- missing hover/focus/pressed/disabled states
-- abrupt state changes
-- over-animated high-frequency interactions
-- mobile overflow or unreachable controls
-- content hidden behind fixed UI
+### Components and states
 
-## Final pass
+Check whether similar components look and behave consistently.
+Review relevant states such as:
+- default
+- hover
+- focus
+- pressed/active
+- selected
+- disabled
+- loading
+- empty
+- error
 
-After the proposed changes, verify that the result still feels like the same product: improved and more coherent, not redesigned into a different design language without being asked.
+### Motion
+
+Ask whether each animation:
+- has a clear purpose
+- matches the interaction frequency
+- feels responsive
+- preserves spatial continuity
+- can handle rapid state changes
+- respects reduced motion
+
+For detailed animation implementation, use the separate `animation` workspace skill.
+
+### Responsive and mobile behavior
+
+Check:
+- layout adaptation
+- horizontal overflow
+- clipped content
+- fixed/sticky overlap
+- action reachability
+- information density
+- whether the interaction model needs to change on smaller screens
+
+For deeper touch, viewport, and browser-platform issues, use `mobile-native`.
+
+### Accessibility
+
+Check:
+- keyboard navigation
+- visible focus
+- semantic labels
+- contrast
+- non-color-only status
+- reduced motion
+- meaningful control states
+- content selection where appropriate
+
+Fix obvious accessibility failures before decorative polish.
+
+## Prioritization
+
+Classify findings by user impact:
+
+- **High:** blocks, confuses, repeatedly slows, or materially degrades the primary workflow.
+- **Medium:** noticeable inconsistency or friction that does not block the task.
+- **Low:** cosmetic refinement with limited user impact.
+
+Do not inflate severity for visual preference. Use High for user-facing problems, not for taste disagreements.
+
+Prioritize recurring and workflow-critical issues over rare cosmetic details.
+
+## Required output
+
+For a review, return:
+
+### Findings
+
+Use one markdown table:
+
+| Priority | Current | Recommended | Why |
+| --- | --- | --- | --- |
+| High | Current behavior or implementation | Smallest practical improvement | User-facing benefit |
+
+Use one row per finding. Keep recommendations concrete enough to implement.
+
+### Summary
+
+After the table, give a brief summary of the main patterns found and the recommended order of work.
+
+Do not provide a numeric overall score or rank the product itself.
+
+## Recipes
+
+For recurring review patterns, consult [RECIPES.md](RECIPES.md). Use the relevant recipe as a starting point and adapt it to the existing interface.
+
+## Final check
+
+Before recommending changes, verify:
+
+1. The recommendation solves a real user-experience issue.
+2. The recommendation fits the existing product language.
+3. The smallest practical change is preferred.
+4. Accessibility and responsive implications were considered.
+5. No unnecessary technology change is being proposed.
