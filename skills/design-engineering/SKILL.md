@@ -15,6 +15,7 @@ Treat the existing application stack as fixed unless the user explicitly request
 - Do not replace the existing component system, router, state system, styling system, or data layer.
 - Prefer existing components, tokens, utilities, and patterns already present in the project.
 - Do not add dependencies merely to implement visual polish.
+- If a design pattern appears to require a technology change, adapt it to the existing project instead.
 
 ## Design posture
 
@@ -62,6 +63,8 @@ Inspect the existing implementation and identify:
 - existing responsive behavior
 
 Extend those patterns before creating new ones.
+
+When a concrete pattern is needed, consult [RECIPES.md](RECIPES.md) and adapt the relevant recipe to the existing product.
 
 ## Quality bar
 
