@@ -9,58 +9,117 @@ Make the web interface behave like a mobile product rather than a desktop layout
 
 ## Technology boundary
 
-Apply platform-level CSS, HTML, and existing component patterns before adding JavaScript or dependencies.
+Use the platform and the project's existing components before adding JavaScript or dependencies.
 
 - Do not add a mobile framework.
-- Do not add a gesture library unless the project already uses one and it is genuinely required.
-- Do not change routing, state management, or backend architecture for mobile polish.
+- Do not add a gesture library solely to solve mobile polish.
+- Do not change routing, state management, data, authentication, or backend architecture for mobile behavior.
 - Prefer capability-based CSS and existing project primitives.
+- If a mobile pattern appears to require a technology change, adapt the pattern to the existing project instead.
 
 ## Hard rules
 
-- Test touch behavior on real hardware before declaring it complete when possible.
-- Prefer media queries based on input capabilities over user-agent or device-name detection.
 - Treat touch, mouse, keyboard, and trackpad as potentially coexisting inputs.
+- Prefer input capabilities such as hover and pointer queries over user-agent or device-name detection.
 - Never disable browser zoom for accessibility reasons.
 - Give interactive controls clear press feedback.
+- Test touch behavior on real hardware before calling touch-specific work complete when possible.
 
-## Common mobile issues
+## Diagnose the symptom first
 
-### Hover
-Do not rely on hover for touch behavior. Gate hover-only visual effects behind pointer/hover capability queries when necessary.
+When reviewing or fixing mobile behavior, identify the actual symptom before changing code.
 
-### Tap feedback
-Avoid default tap flashes when they conflict with a deliberate interaction design, and replace the removed feedback with a clear active/press state.
+| Symptom | Typical direction |
+| --- | --- |
+| Hover state sticks after tap | Gate hover styles by hover/pointer capability |
+| Tap flash conflicts with designed feedback | Replace browser highlight with deliberate control feedback |
+| Full-height layout overflows mobile chrome | Use the appropriate modern viewport unit |
+| Input causes unwanted zoom | Use an adequate input font size; never disable zoom |
+| Tap feels delayed | Provide press feedback early and remove unnecessary interaction delay |
+| Nested scroll moves the page behind it | Use `overscroll-behavior` |
+| Content collides with notch/home indicator | Use safe-area insets with edge-to-edge viewport handling |
+| Long-press selects control text | Disable selection only on controls |
+| Carousel competes with page scrolling | Declare the intended touch axes |
+| Layout is correct in emulation but wrong on phone | Verify on real hardware |
 
-### Viewport height
-Prefer modern viewport units such as `dvh` for app shells where browser chrome can change the visible height.
+For concrete fixes, consult [RECIPES.md](RECIPES.md).
 
-### Safe areas
-Account for device safe areas when content is fixed near the top or bottom edges.
+## Hover and touch
 
-### Inputs
-Avoid mobile text zoom caused by undersized inputs. Use appropriate input types and keyboard hints where they improve the experience.
+Do not rely on hover for touch behavior.
 
-### Scrolling
-Use `overscroll-behavior` and appropriate touch-action values instead of JavaScript scroll interception whenever possible.
+- Put hover-only visual effects behind capability queries such as `(hover: hover) and (pointer: fine)`.
+- Provide useful active/pressed feedback independently.
+- Do not infer touch capability from screen width or user-agent strings.
 
-### Touch targets
-Make controls easy to hit without making the visual UI unnecessarily oversized. Keep primary actions comfortable and predictable.
+## Viewport and safe areas
 
-## Mobile-specific UI posture
+Choose viewport behavior according to the surface:
+
+- Use `dvh` when an app shell should follow the currently visible viewport.
+- Use `svh` when a stable minimum viewport is more important.
+- Do not assume `100vh` equals the visible mobile viewport.
+
+For fixed elements near screen edges, account for safe-area insets where the platform exposes them.
+
+## Inputs and keyboard
+
+Mobile inputs should be easy to use and should communicate their intended input type to the platform.
+
+- Avoid undersized input text that causes unwanted mobile zoom.
+- Use semantic input types and input modes.
+- Use keyboard hints only when they match the field's actual purpose.
+- Test forms with the software keyboard open because it changes the usable viewport.
+
+## Scrolling and touch ownership
+
+Prefer browser-native scrolling and CSS behavior over JavaScript interception.
+
+- Use `overscroll-behavior` to control scroll chaining.
+- Use `touch-action` to describe which axes the browser may handle.
+- Use native scroll snapping when it solves a carousel or paging problem.
+- Avoid global `touchmove` prevention as a default scrolling strategy.
+
+## Mobile interaction posture
+
+Adapt the interaction model when needed instead of shrinking desktop UI.
 
 Prefer:
-
-- clear full-width or edge-aware actions
-- sheets and drawers for contextual tasks when they fit the interaction
-- sticky actions that remain reachable
-- generous touch spacing
+- reachable primary actions
+- edge-aware or bottom-oriented contextual surfaces when appropriate
+- comfortable touch spacing
 - concise information hierarchy
+- controls that remain visible and usable around browser/device UI
 
 Avoid:
-
-- desktop tables with no mobile strategy
-- hover-dependent controls
-- tiny icon-only targets without accessible labels
+- hover-dependent actions
+- precision-only interactions
 - fixed elements that cover content
-- interactions that require precision tapping
+- desktop tables with no mobile strategy
+- unnecessarily large controls created only to satisfy touch target concerns
+
+## Accessibility
+
+Mobile polish must not trade away accessibility.
+
+- Never disable zoom.
+- Keep normal content selectable.
+- Preserve keyboard focus behavior for external keyboards and hybrid devices.
+- Ensure touch feedback does not replace an accessible state.
+- Provide reduced-motion behavior for substantial movement when the interaction also uses animation.
+
+## Verification
+
+Code inspection can confirm declarations and interaction logic, but some mobile behaviors require a real device.
+
+When possible, test:
+- touch and press feedback
+- browser chrome and viewport height
+- software keyboard
+- safe areas
+- nested scrolling and overscroll
+- landscape
+- fixed/sticky controls
+- installed/PWA mode when relevant
+
+Do not claim a phone-specific behavior is verified if it was only tested in desktop device emulation.
